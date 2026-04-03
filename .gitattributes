@@ -1,0 +1,13 @@
+# Export ignores (excluded from dist archives)
+/.agent export-ignore
+/.editorconfig export-ignore
+/.gitattributes export-ignore
+/.github export-ignore
+/.gitignore export-ignore
+/tests export-ignore
+/phpunit.xml export-ignore
+/composer.lock export-ignore
+/pint.json export-ignore
+/CHANGELOG.md export-ignore
+/CONTRIBUTING.md export-ignore
+/AUTHORS.md export-ignore

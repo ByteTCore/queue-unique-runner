@@ -1,0 +1,35 @@
+# Directories
+/vendor/
+/node_modules/
+
+# IDE
+/.idea/
+/.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+/.phpunit.cache/
+/.phpunit.result.cache
+/coverage/
+.phpunit.result.cache
+
+# Tools & Analysis
+.php-cs-fixer.cache
+
+# Build
+/build/
+*.phar
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Project Engine / Context
+.agent/

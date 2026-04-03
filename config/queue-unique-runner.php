@@ -1,0 +1,98 @@
+<?php
+
+return [
+
+    /*
+    |--------------------------------------------------------------------------
+    | Lock Driver
+    |--------------------------------------------------------------------------
+    |
+    | The driver used to manage distributed job locks. The "database" driver
+    | stores locks in a database table, while "redis" uses Redis SET NX
+    | with Lua scripts for atomic operations.
+    |
+    | Supported: "database", "redis"
+    |
+    */
+    'driver' => env('SINGLE_JOB_DRIVER', 'database'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Lock TTL (Time To Live)
+    |--------------------------------------------------------------------------
+    |
+    | Maximum time in seconds a lock can be held before it is considered
+    | expired. After expiration, another server can acquire the lock.
+    | Set this higher than your longest expected job duration.
+    |
+    */
+    'ttl' => (int) env('SINGLE_JOB_TTL', 300),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Retry Delay
+    |--------------------------------------------------------------------------
+    |
+    | When a job cannot acquire a lock (another instance is running), the
+    | job will be released back to the queue and retried after this many
+    | seconds. Adjust based on your expected job duration.
+    |
+    */
+    'retry_delay' => (int) env('SINGLE_JOB_RETRY_DELAY', 30),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Heartbeat Configuration
+    |--------------------------------------------------------------------------
+    |
+    | The heartbeat extends the lock TTL periodically while a job is running.
+    | This prevents premature lock expiration for long-running jobs and
+    | enables crash recovery (if heartbeat stops, the lock expires).
+    |
+    | Note: Heartbeat requires the pcntl extension (Unix/Linux/macOS only).
+    | On Windows or without pcntl, only TTL-based expiration is used.
+    |
+    */
+    'heartbeat' => [
+        'enabled' => (bool) env('SINGLE_JOB_HEARTBEAT', true),
+        'interval' => (int) env('SINGLE_JOB_HEARTBEAT_INTERVAL', 30),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Database Table
+    |--------------------------------------------------------------------------
+    |
+    | The database table name used to store lock records when using the
+    | "database" driver. This table is created via the package migration.
+    |
+    */
+    'table' => env('SINGLE_JOB_TABLE', 'queue_unique_runner_locks'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Redis Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Connection and prefix settings for the "redis" driver. The connection
+    | name should match one defined in your config/database.php redis config.
+    |
+    */
+    'redis' => [
+        'connection' => env('SINGLE_JOB_REDIS_CONNECTION', 'default'),
+        'prefix' => env('SINGLE_JOB_REDIS_PREFIX', 'queue-unique-runner:'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Server Identifier
+    |--------------------------------------------------------------------------
+    |
+    | A unique identifier for this server/worker instance. When null, the
+    | package auto-detects using hostname:pid. Set this explicitly when
+    | running in containerized environments (Docker, Kubernetes).
+    |
+    */
+    'server_id' => env('SINGLE_JOB_SERVER_ID'),
+
+];

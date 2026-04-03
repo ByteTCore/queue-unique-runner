@@ -1,0 +1,89 @@
+name: Update Version Tag
+
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Update composer.json version
+        run: |
+          VERSION=${{ steps.version.outputs.VERSION }}
+          if grep -q '"version"' composer.json; then
+            sed -i "s/\"version\": \".*\"/\"version\": \"$VERSION\"/" composer.json
+          else
+            sed -i "s/\"name\"/\"version\": \"$VERSION\",\n    \"name\"/" composer.json
+          fi
+
+      - name: Generate release notes
+        id: notes
+        run: |
+          PREVIOUS_TAG=$(git tag --sort=-version:refname | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | head -2 | tail -1)
+          
+          if [ -z "$PREVIOUS_TAG" ] || [ "$PREVIOUS_TAG" = "${GITHUB_REF#refs/tags/}" ]; then
+            echo "NOTES=Initial release" >> $GITHUB_OUTPUT
+            echo "PREVIOUS_TAG=" >> $GITHUB_OUTPUT
+          else
+            NOTES=$(git log --pretty=format:"- %s (%h)" $PREVIOUS_TAG..${GITHUB_REF#refs/tags/} | head -50)
+            echo "NOTES<<EOF" >> $GITHUB_OUTPUT
+            echo "$NOTES" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+            echo "PREVIOUS_TAG=$PREVIOUS_TAG" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Update CHANGELOG.md
+        env:
+          NOTES: ${{ steps.notes.outputs.NOTES }}
+          VERSION: ${{ steps.version.outputs.VERSION }}
+        run: |
+          DATE=$(date +'%Y-%m-%d')
+          echo "## [$VERSION] - $DATE" > tmp_changelog.md
+          echo "$NOTES" >> tmp_changelog.md
+          echo "" >> tmp_changelog.md
+          
+          if [ -f CHANGELOG.md ]; then
+            cat CHANGELOG.md >> tmp_changelog.md
+          fi
+          mv tmp_changelog.md CHANGELOG.md
+
+      - name: Commit version and changelog update
+        env:
+          VERSION: ${{ steps.version.outputs.VERSION }}
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add composer.json CHANGELOG.md
+          git diff --staged --quiet || git commit -m "chore: release $VERSION"
+          git push origin HEAD:master || git push origin HEAD:main
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          body: |
+            ## What's Changed
+
+            ${{ steps.notes.outputs.NOTES }}
+
+            ${{ steps.notes.outputs.PREVIOUS_TAG != '' && format('**Full Changelog**: https://github.com/{0}/compare/{1}...{2}', github.repository, steps.notes.outputs.PREVIOUS_TAG, github.ref_name) || '' }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
