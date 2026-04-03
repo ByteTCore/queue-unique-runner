@@ -1,3 +1,6 @@
+## [1.0.0] - 2026-04-03
+Initial release
+
 # Changelog
 
 All notable changes to `bytetcore/queue-unique-runner` will be documented in this file.
