@@ -21,8 +21,8 @@ class RedisDriverTest extends TestCase
     public function test_acquire_calls_redis_set_with_nx_ex(): void
     {
         $connection = Mockery::mock();
-        $connection->shouldReceive('command')
-            ->with('set', ['test-queue-unique-runner:test-key', 'server-1', 'EX', 300, 'NX'])
+        $connection->shouldReceive('set')
+            ->with('test-queue-unique-runner:test-key', 'server-1', 'EX', 300, 'NX')
             ->once()
             ->andReturn(true);
 
@@ -39,8 +39,8 @@ class RedisDriverTest extends TestCase
     public function test_acquire_returns_false_when_lock_exists(): void
     {
         $connection = Mockery::mock();
-        $connection->shouldReceive('command')
-            ->with('set', ['test-queue-unique-runner:test-key', 'server-2', 'EX', 300, 'NX'])
+        $connection->shouldReceive('set')
+            ->with('test-queue-unique-runner:test-key', 'server-2', 'EX', 300, 'NX')
             ->once()
             ->andReturn(null);
 

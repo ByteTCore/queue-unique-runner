@@ -21,7 +21,7 @@ class RedisDriver implements LockDriver
         $redisKey = $this->prefixedKey($key);
 
         $result = Redis::connection($this->connection)
-            ->command('set', [$redisKey, $serverId, 'EX', $ttl, 'NX']);
+            ->set($redisKey, $serverId, 'EX', $ttl, 'NX');
 
         return (bool) $result;
     }
