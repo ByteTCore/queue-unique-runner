@@ -1,3 +1,6 @@
+## [1.0.2] - 2026-04-05
+- feat: update configuration keys for queue unique runner to use new environment variables (f1701a3)
+
 ## [1.0.1] - 2026-04-05
 - Merge remote-tracking branch 'origin/master' (d0308c6)
 - chore: enhance update-tag.yml to conditionally commit and update tags on release (06b903b)

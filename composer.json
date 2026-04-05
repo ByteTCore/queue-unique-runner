@@ -1,6 +1,6 @@
 {
     "name": "bytetcore/queue-unique-runner",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "Ensure Laravel queue jobs run on only one server instance at a time with database or Redis distributed locking, heartbeat, and crash recovery.",
     "keywords": [
         "laravel",
