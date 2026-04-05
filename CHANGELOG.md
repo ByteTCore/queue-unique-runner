@@ -1,3 +1,6 @@
+## [1.0.3] - 2026-04-05
+- feat: add lock failure strategy to queue unique runner configuration (066cbaf)
+
 ## [1.0.2] - 2026-04-05
 - feat: update configuration keys for queue unique runner to use new environment variables (f1701a3)
 
