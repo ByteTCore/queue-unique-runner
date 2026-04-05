@@ -129,8 +129,8 @@ Uses `SET NX EX` commands and Lua scripts for atomic operations. Extremely fast 
 Change your `.env`:
 
 ```env
-SINGLE_JOB_DRIVER=redis
-SINGLE_JOB_REDIS_CONNECTION=default
+QUEUE_UNIQUE_RUNNER_DRIVER=redis
+QUEUE_UNIQUE_RUNNER_REDIS_CONNECTION=default
 ```
 
 ## Requirements

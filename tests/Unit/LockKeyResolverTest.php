@@ -3,7 +3,7 @@
 namespace Bytetcore\QueueUniqueRunner\Tests\Unit;
 
 use Bytetcore\QueueUniqueRunner\Support\LockKeyResolver;
-use PHPUnit\Framework\TestCase;
+use Bytetcore\QueueUniqueRunner\Tests\TestCase;
 
 class LockKeyResolverTest extends TestCase
 {
@@ -141,6 +141,16 @@ class LockKeyResolverTest extends TestCase
             '/^queue-unique-runner:' . preg_quote($class, '/') . ':[a-f0-9]{64}$/',
             $key
         );
+    }
+
+    public function test_custom_prefix_from_config(): void
+    {
+        config(['queue-unique-runner.prefix' => 'custom-prefix']);
+        
+        $job = new TestJobA(1);
+        $key = $this->resolver->resolve($job, 'class');
+
+        $this->assertStringStartsWith('custom-prefix:', $key);
     }
 }
 

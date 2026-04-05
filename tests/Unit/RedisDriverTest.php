@@ -15,14 +15,13 @@ class RedisDriverTest extends TestCase
 
         $app['config']->set('queue-unique-runner.driver', 'redis');
         $app['config']->set('queue-unique-runner.redis.connection', 'default');
-        $app['config']->set('queue-unique-runner.redis.prefix', 'test-queue-unique-runner:');
     }
 
     public function test_acquire_calls_redis_set_with_nx_ex(): void
     {
         $connection = Mockery::mock();
         $connection->shouldReceive('set')
-            ->with('test-queue-unique-runner:test-key', 'server-1', 'EX', 300, 'NX')
+            ->with('test-key', 'server-1', 'EX', 300, 'NX')
             ->once()
             ->andReturn(true);
 
@@ -40,7 +39,7 @@ class RedisDriverTest extends TestCase
     {
         $connection = Mockery::mock();
         $connection->shouldReceive('set')
-            ->with('test-queue-unique-runner:test-key', 'server-2', 'EX', 300, 'NX')
+            ->with('test-key', 'server-2', 'EX', 300, 'NX')
             ->once()
             ->andReturn(null);
 
@@ -60,7 +59,7 @@ class RedisDriverTest extends TestCase
         $connection->shouldReceive('eval')
             ->withArgs(function ($script, $numKeys, $key, $serverId) {
                 return $numKeys === 1
-                    && $key === 'test-queue-unique-runner:test-key'
+                    && $key === 'test-key'
                     && $serverId === 'server-1'
                     && str_contains($script, 'redis.call("get"')
                     && str_contains($script, 'redis.call("del"');
@@ -101,7 +100,7 @@ class RedisDriverTest extends TestCase
         $connection->shouldReceive('eval')
             ->withArgs(function ($script, $numKeys, $key, $serverId, $ttl) {
                 return $numKeys === 1
-                    && $key === 'test-queue-unique-runner:test-key'
+                    && $key === 'test-key'
                     && $serverId === 'server-1'
                     && $ttl === 600
                     && str_contains($script, 'redis.call("expire"');
@@ -140,7 +139,7 @@ class RedisDriverTest extends TestCase
     {
         $connection = Mockery::mock();
         $connection->shouldReceive('del')
-            ->with('test-queue-unique-runner:test-key')
+            ->with('test-key')
             ->once()
             ->andReturn(1);
 
@@ -158,7 +157,7 @@ class RedisDriverTest extends TestCase
     {
         $connection = Mockery::mock();
         $connection->shouldReceive('exists')
-            ->with('test-queue-unique-runner:test-key')
+            ->with('test-key')
             ->once()
             ->andReturn(1);
 
@@ -175,7 +174,7 @@ class RedisDriverTest extends TestCase
     {
         $connection = Mockery::mock();
         $connection->shouldReceive('exists')
-            ->with('test-queue-unique-runner:test-key')
+            ->with('test-key')
             ->once()
             ->andReturn(0);
 
@@ -192,7 +191,7 @@ class RedisDriverTest extends TestCase
     {
         $connection = Mockery::mock();
         $connection->shouldReceive('get')
-            ->with('test-queue-unique-runner:test-key')
+            ->with('test-key')
             ->once()
             ->andReturn('server-1');
 
@@ -209,7 +208,7 @@ class RedisDriverTest extends TestCase
     {
         $connection = Mockery::mock();
         $connection->shouldReceive('get')
-            ->with('test-queue-unique-runner:test-key')
+            ->with('test-key')
             ->once()
             ->andReturn(null);
 

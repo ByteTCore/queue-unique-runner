@@ -14,7 +14,19 @@ return [
     | Supported: "database", "redis"
     |
     */
-    'driver' => env('SINGLE_JOB_DRIVER', 'database'),
+
+    'driver' => env('QUEUE_UNIQUE_RUNNER_DRIVER', 'database'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Lock Prefix
+    |--------------------------------------------------------------------------
+    |
+    | The prefix used for all lock keys across the system (both Redis and Database).
+    | This ensures your lock keys don't conflict with other data.
+    |
+    */
+    'prefix' => env('QUEUE_UNIQUE_RUNNER_PREFIX', 'queue-unique-runner'),
 
     /*
     |--------------------------------------------------------------------------
@@ -26,7 +38,7 @@ return [
     | Set this higher than your longest expected job duration.
     |
     */
-    'ttl' => (int) env('SINGLE_JOB_TTL', 300),
+    'ttl' => (int) env('QUEUE_UNIQUE_RUNNER_TTL', 300),
 
     /*
     |--------------------------------------------------------------------------
@@ -38,7 +50,7 @@ return [
     | seconds. Adjust based on your expected job duration.
     |
     */
-    'retry_delay' => (int) env('SINGLE_JOB_RETRY_DELAY', 30),
+    'retry_delay' => (int) env('QUEUE_UNIQUE_RUNNER_RETRY_DELAY', 30),
 
     /*
     |--------------------------------------------------------------------------
@@ -54,8 +66,8 @@ return [
     |
     */
     'heartbeat' => [
-        'enabled' => (bool) env('SINGLE_JOB_HEARTBEAT', true),
-        'interval' => (int) env('SINGLE_JOB_HEARTBEAT_INTERVAL', 30),
+        'enabled' => (bool) env('QUEUE_UNIQUE_RUNNER_HEARTBEAT', true),
+        'interval' => (int) env('QUEUE_UNIQUE_RUNNER_HEARTBEAT_INTERVAL', 30),
     ],
 
     /*
@@ -67,20 +79,19 @@ return [
     | "database" driver. This table is created via the package migration.
     |
     */
-    'table' => env('SINGLE_JOB_TABLE', 'queue_unique_runner_locks'),
+    'table' => env('QUEUE_UNIQUE_RUNNER_TABLE', 'queue_unique_runner_locks'),
 
     /*
     |--------------------------------------------------------------------------
     | Redis Configuration
     |--------------------------------------------------------------------------
     |
-    | Connection and prefix settings for the "redis" driver. The connection
+    | Connection setting for the "redis" driver. The connection
     | name should match one defined in your config/database.php redis config.
     |
     */
     'redis' => [
-        'connection' => env('SINGLE_JOB_REDIS_CONNECTION', 'default'),
-        'prefix' => env('SINGLE_JOB_REDIS_PREFIX', 'queue-unique-runner:'),
+        'connection' => env('QUEUE_UNIQUE_RUNNER_REDIS_CONNECTION', 'default'),
     ],
 
     /*
@@ -93,6 +104,6 @@ return [
     | running in containerized environments (Docker, Kubernetes).
     |
     */
-    'server_id' => env('SINGLE_JOB_SERVER_ID'),
+    'server_id' => env('QUEUE_UNIQUE_RUNNER_SERVER_ID'),
 
 ];

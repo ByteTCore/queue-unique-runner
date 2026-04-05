@@ -11,7 +11,7 @@ class ServerIdentifierTest extends TestCase
     {
         parent::tearDown();
         // Reset config if it was mocked
-        putenv('SINGLE_JOB_SERVER_ID');
+        putenv('QUEUE_UNIQUE_RUNNER_SERVER_ID');
     }
 
     public function test_generates_identifier_from_hostname_and_pid(): void
@@ -46,6 +46,8 @@ class ServerIdentifierTest extends TestCase
 
         $this->assertEquals('test-server-123', $id);
     }
+
+
 
     public function test_reset_clears_cached_identifier(): void
     {

@@ -7,21 +7,17 @@ use Illuminate\Support\Facades\Redis;
 
 class RedisDriver implements LockDriver
 {
-    private string $prefix;
     private string $connection;
 
     public function __construct()
     {
-        $this->prefix = config('queue-unique-runner.redis.prefix', 'queue-unique-runner:');
         $this->connection = config('queue-unique-runner.redis.connection', 'default');
     }
 
     public function acquire(string $key, string $serverId, int $ttl): bool
     {
-        $redisKey = $this->prefixedKey($key);
-
         $result = Redis::connection($this->connection)
-            ->set($redisKey, $serverId, 'EX', $ttl, 'NX');
+            ->set($key, $serverId, 'EX', $ttl, 'NX');
 
         return (bool) $result;
     }
@@ -37,7 +33,7 @@ end
 LUA;
 
         return (bool) Redis::connection($this->connection)
-            ->eval($script, 1, $this->prefixedKey($key), $serverId);
+            ->eval($script, 1, $key, $serverId);
     }
 
     public function heartbeat(string $key, string $serverId, int $ttl): bool
@@ -51,25 +47,25 @@ end
 LUA;
 
         return (bool) Redis::connection($this->connection)
-            ->eval($script, 1, $this->prefixedKey($key), $serverId, $ttl);
+            ->eval($script, 1, $key, $serverId, $ttl);
     }
 
     public function forceRelease(string $key): bool
     {
         return (bool) Redis::connection($this->connection)
-            ->del($this->prefixedKey($key));
+            ->del($key);
     }
 
     public function isLocked(string $key): bool
     {
         return (bool) Redis::connection($this->connection)
-            ->exists($this->prefixedKey($key));
+            ->exists($key);
     }
 
     public function getCurrentOwner(string $key): ?string
     {
         $owner = Redis::connection($this->connection)
-            ->get($this->prefixedKey($key));
+            ->get($key);
 
         return $owner ?: null;
     }
@@ -80,8 +76,5 @@ LUA;
         return 0;
     }
 
-    private function prefixedKey(string $key): string
-    {
-        return $this->prefix . $key;
-    }
+
 }

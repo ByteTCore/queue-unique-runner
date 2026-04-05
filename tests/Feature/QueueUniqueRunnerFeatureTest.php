@@ -34,7 +34,7 @@ class QueueUniqueRunnerFeatureTest extends TestCase
         
         // Assert lock doesn't exist before dispatch
         $driver = $this->app->make(LockDriver::class);
-        $key = 'queue-unique-runner:'.TestFeatureJob::class;
+        $key = 'queue-unique-runner:' . TestFeatureJob::class;
         $this->assertFalse($driver->isLocked($key));
 
         // Dispatch and execute the job
@@ -64,7 +64,7 @@ class TestFeatureJob implements ShouldQueue
     {
         // To verify the lock exists WHILE running!
         $driver = app(\Bytetcore\QueueUniqueRunner\Contracts\LockDriver::class);
-        $key = 'queue-unique-runner:'.self::class;
+        $key = 'queue-unique-runner:' . self::class;
         
         if (!$driver->isLocked($key)) {
             throw new \Exception("Lock should exist while job is running!");

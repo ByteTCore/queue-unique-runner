@@ -4,19 +4,18 @@ namespace Bytetcore\QueueUniqueRunner\Support;
 
 class LockKeyResolver
 {
-    private const PREFIX = 'queue-unique-runner';
-
     public function resolve(object $job, string $scope = 'class', ?string $identifier = null): string
     {
         $jobClass = get_class($job);
+        $prefix = config('queue-unique-runner.prefix', 'queue-unique-runner');
 
         if ($scope === 'instance') {
             $instanceKey = $identifier ?? $this->resolveInstanceKey($job);
 
-            return self::PREFIX . ':' . $jobClass . ':' . $instanceKey;
+            return $prefix . ':' . $jobClass . ':' . $instanceKey;
         }
 
-        return self::PREFIX . ':' . $jobClass;
+        return $prefix . ':' . $jobClass;
     }
 
     private function resolveInstanceKey(object $job): string
