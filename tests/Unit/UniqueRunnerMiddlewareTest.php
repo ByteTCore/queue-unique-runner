@@ -66,6 +66,23 @@ class UniqueRunnerMiddlewareTest extends TestCase
         $this->assertFalse($jobExecuted);
     }
 
+    public function test_deletes_job_when_lock_not_acquired_and_delete_strategy_is_active(): void
+    {
+        $jobExecuted = false;
+        $job = $this->createMockJob();
+        $job->shouldReceive('delete')->once();
+        $job->shouldReceive('queueUniqueRunnerOnLockFail')->andReturn('delete');
+
+        $this->mockDriver->shouldReceive('acquire')->once()->andReturn(false);
+
+        $middleware = new UniqueRunner();
+        $middleware->handle($job, function () use (&$jobExecuted) {
+            $jobExecuted = true;
+        });
+
+        $this->assertFalse($jobExecuted);
+    }
+
     public function test_releases_lock_even_when_job_throws(): void
     {
         $job = $this->createMockJob();
@@ -248,6 +265,7 @@ class UniqueRunnerMiddlewareTest extends TestCase
         $job->shouldReceive('queueUniqueRunnerTtl')->andReturn(null)->byDefault();
         $job->shouldReceive('queueUniqueRunnerRetryDelay')->andReturn(30)->byDefault();
         $job->shouldReceive('queueUniqueRunnerHeartbeat')->andReturn(false)->byDefault();
+        $job->shouldReceive('queueUniqueRunnerOnLockFail')->andReturn('release')->byDefault();
 
         return $job;
     }
@@ -277,5 +295,7 @@ class DummyMiddlewareJob {
     public function queueUniqueRunnerTtl() { return null; }
     public function queueUniqueRunnerRetryDelay() { return 30; }
     public function queueUniqueRunnerHeartbeat() { return false; }
+    public function queueUniqueRunnerOnLockFail() { return 'release'; }
     public function release($delay = 0) {}
+    public function delete() {}
 }

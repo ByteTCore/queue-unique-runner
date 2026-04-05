@@ -54,6 +54,21 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Lock Failure Strategy
+    |--------------------------------------------------------------------------
+    |
+    | What to do when a lock cannot be acquired (another instance is running).
+    |
+    | "release": Release the job back to the queue to be retried later.
+    |           This will increment the job attempts count.
+    | "delete": Delete the job from the queue immediately (silent skip).
+    |           Use this to avoid MaxAttemptsExceededException.
+    |
+    */
+    'on_lock_fail' => env('QUEUE_UNIQUE_RUNNER_ON_LOCK_FAIL', 'release'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Heartbeat Configuration
     |--------------------------------------------------------------------------
     |

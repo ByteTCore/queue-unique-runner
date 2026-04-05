@@ -73,4 +73,12 @@ trait RunsOnUniqueRunner
     {
         return (bool) config('queue-unique-runner.heartbeat.enabled', true);
     }
+
+    /**
+     * Strategy when lock cannot be acquired: 'release' or 'delete'.
+     */
+    public function queueUniqueRunnerOnLockFail(): string
+    {
+        return (string) config('queue-unique-runner.on_lock_fail', 'release');
+    }
 }

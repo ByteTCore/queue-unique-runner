@@ -42,6 +42,14 @@ class UniqueRunner
         $ttl = $this->resolveTtl($job);
 
         if (! $driver->acquire($key, $serverId, $ttl)) {
+            $strategy = $this->resolveOnLockFail($job);
+
+            if ($strategy === 'delete') {
+                $job->delete();
+
+                return;
+            }
+
             $delay = $this->resolveRetryDelay($job);
             $job->release($delay);
 
@@ -102,5 +110,14 @@ class UniqueRunner
         }
 
         return (bool) config('queue-unique-runner.heartbeat.enabled', true);
+    }
+
+    private function resolveOnLockFail(object $job): string
+    {
+        if (method_exists($job, 'queueUniqueRunnerOnLockFail')) {
+            return $job->queueUniqueRunnerOnLockFail();
+        }
+
+        return (string) config('queue-unique-runner.on_lock_fail', 'release');
     }
 }
